@@ -1,0 +1,87 @@
+{
+  "name": "agentia-plugin-driftguard",
+  "description": "Pre-promotion overwrite and regression radar for Copado user stories. Adds `agentia guard preflight`.",
+  "version": "0.1.0",
+  "author": "Jyotika",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": "./dist/index.js",
+  "license": "MIT",
+  "keywords": [
+    "oclif-plugin",
+    "agentia",
+    "copado",
+    "salesforce",
+    "devops"
+  ],
+  "bin": {
+    "driftguard": "./bin/driftguard.js"
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/skills",
+    "/hooks",
+    "/oclif.manifest.json"
+  ],
+  "dependencies": {
+    "@copado/agentia-plugin-sdk": "^0.1.2",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "peerDependencies": {
+    "@oclif/core": "^4"
+  },
+  "devDependencies": {
+    "@oclif/core": "^4",
+    "@types/node": "^22",
+    "oclif": "^4",
+    "shx": "^0.3.3",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "agentia": {
+    "hostApi": 1,
+    "requires": [
+      "auth.status",
+      "format.table"
+    ],
+    "optional": [
+      "ai.ask",
+      "organization.healthCheck",
+      "work.getWorkItem",
+      "workspace.current"
+    ],
+    "permissions": {
+      "network": [],
+      "files": "read: the repository or folders passed as flags; write: a temp folder for org retrievals and the --report file",
+      "commands": [
+        "git",
+        "sf"
+      ],
+      "env": []
+    }
+  },
+  "oclif": {
+    "bin": "agentia",
+    "dirname": "agentia-cli",
+    "topicSeparator": " ",
+    "commands": "./dist/commands",
+    "topics": {
+      "guard": {
+        "description": "Pre-promotion safety checks for user stories"
+      }
+    }
+  },
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "clean": "shx rm -f oclif.manifest.json",
+    "demo": "node bin/driftguard.js guard preflight --story US-0001234 --base-dir demo/base --story-dir demo/stories/US-0001234 --target-dir demo/uat-org --other-stories demo/stories --report demo/preflight-report.md",
+    "demo:fixed": "node bin/driftguard.js guard preflight --story US-0001234 --base-dir demo/uat-org --story-dir demo/resynced/US-0001234 --target-dir demo/uat-org --report demo/preflight-report-fixed.md",
+    "test": "node --test \"test/**/*.test.js\"",
+    "prepack": "npm run build && oclif manifest",
+    "postpack": "npm run clean"
+  }
+}

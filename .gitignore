@@ -1,0 +1,8 @@
+node_modules/
+dist/
+oclif.manifest.json
+*.tsbuildinfo
+.sf/
+.sfdx/
+.agentia/
+demo/preflight-report*.md

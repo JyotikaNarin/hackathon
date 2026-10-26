@@ -1,0 +1,33 @@
+#!/bin/sh
+# DriftGuard Git pre-push hook: blocks pushing a Copado story branch that would overwrite newer work in the target org.
+# Install: copy to .git/hooks/pre-push (or `git config core.hooksPath hooks`), and set the target alias:
+#   git config driftguard.targetOrg uat
+# Bypass for one push (not recommended): DRIFTGUARD_SKIP=1 git push
+
+[ "$DRIFTGUARD_SKIP" = "1" ] && exit 0
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+case "$branch" in
+  feature/*) ;;
+  *) exit 0 ;;
+esac
+
+target=$(git config driftguard.targetOrg)
+if [ -z "$target" ]; then
+  echo "DriftGuard: set the target org first: git config driftguard.targetOrg <sf-alias>" >&2
+  exit 0
+fi
+
+story=${branch#feature/}
+base=$(git config driftguard.baseBranch || echo main)
+
+echo "DriftGuard: pre-flight for $story against $target..."
+agentia guard preflight --story "$story" --repo . --branch "$branch" --base "$base" --target-org "$target" --report preflight.md
+status=$?
+
+if [ $status -eq 2 ]; then
+  echo "DriftGuard: push blocked. See preflight.md, fix the BLOCK findings, and push again." >&2
+  exit 1
+fi
+
+exit 0
